@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Aaryan's dApp</title>
+   <style>
+       @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+       body {
+           text-align: center;
+           font-family: 'Poppins', sans-serif;
+           background-color: #f5f5f5;
+           color: #333;
+       }
+
+       div {
+           width: 30%;
+           margin: 0 auto;
+           display: flex;
+           flex-direction: column;
+           background-color: #fff;
+           padding: 30px;
+           border-radius: 10px;
+           box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+           animation: fadeIn 1s ease;
+       }
+
+       h1 {
+           margin-bottom: 20px;
+           color: #4CAF50;
+           text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+       }
+
+       button {
+           width: 100%;
+           margin: 10px 0px 5px 0px;
+           padding: 10px;
+           background-color: #4CAF50;
+           color: #fff;
+           border: none;
+           border-radius: 5px;
+           cursor: pointer;
+           transition: background-color 0.3s ease;
+       }
+
+       button:hover {
+           background-color: #45a049;
+       }
+
+       input[type="text"] {
+           padding: 10px;
+           border: 1px solid #ccc;
+           border-radius: 5px;
+           margin-bottom: 10px;
+       }
+
+       @keyframes fadeIn {
+           from {
+               opacity: 0;
+           }
+           to {
+               opacity: 1;
+           }
+       }
+   </style>
+</head>
+<body>
+   <div>
+       <h1>This is my dApp!</h1>
+       <p>Here we can set or get the mood:</p>
+       <label for="mood">Input Mood:</label>
+       <input type="text" id="mood" />
+       <button onclick="getMood()">Get Mood</button>
+       <button onclick="setMood()">Set Mood</button>
+   </div>
+</body>
+<script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js" type="application/javascript"></script>
+    <script>
+	const MoodContractAddress = "0xd9145CCE52D386f254917e481eB44e9943F39138";
+        MoodContractABI = [
+            {
+                "inputs": [
+                    {
+                        "internalType": "string",
+                        "name": "_mood",
+                        "type": "string"
+                    }
+                ],
+                "name": "setMood",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "getMood",
+                "outputs": [
+                    {
+                        "internalType": "string",
+                        "name": "",
+                        "type": "string"
+                    }
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            }
+        ]
+        let MoodContract;
+        let signer
+        const provider = new ethers.providers.Web3Provider(window.ethereum, "sepolia");
+        provider.send("eth_requestAccounts", []).then(() => {
+            provider.listAccounts().then((accounts) => {
+                signer = provider.getSigner(accounts[0]);
+                MoodContract = new ethers.Contract(
+                    MoodContractAddress,
+                    MoodContractABI,
+                    signer
+                );
+            });
+        });
+        async function getMood() {
+            const getMoodPromise = MoodContract.getMood();
+            const Mood = await getMoodPromise;
+            console.log(Mood);
+        }
+
+
+        async function setMood() {
+            const mood = document.getElementById("mood").value;
+            const setMoodPromise = MoodContract.setMood(mood);
+            await setMoodPromise;
+        }
+
+    </script>
+
+</html>
